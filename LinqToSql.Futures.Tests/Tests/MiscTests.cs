@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Data;
+using System.Data.Linq;
 using System.Linq;
 using LinqToSql.Futures.Tests.Data;
 using Xunit;
@@ -36,6 +38,30 @@ namespace LinqToSql.Futures.Tests.Tests
                 Assert.False(pets.IsValueCreated);
                 Assert.Equal(0, dataContext.FutureCollection.Count);
             }
+        }
+    }
+
+    public class TransactionTests
+    {
+        [Fact]
+        public void Example()
+        {
+            using (var dataContext = new FutureSimpleDataContext())
+            using (dataContext.BeginTransaction())
+            {
+                // TODO: Stuff!
+            }
+        }
+    }
+
+    public static class DataContextExtensions
+    {
+        public static IDbTransaction BeginTransaction(this DataContext dataContext, IsolationLevel isolationLevel = IsolationLevel.Unspecified)
+        {
+            if (dataContext.Connection.State != ConnectionState.Open)
+                dataContext.Connection.Open();
+
+            return dataContext.Transaction = dataContext.Connection.BeginTransaction(isolationLevel);
         }
     }
 }
